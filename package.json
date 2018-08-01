@@ -1,0 +1,27 @@
+{
+  "name": "feedbackanalysis",
+  "version": "1.0.0",
+  "description": "electron app to do automatic sentiment analysis",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guruvyasa/FeedbackAnalysis.git"
+  },
+  "keywords": [
+    "electron",
+    "sentiment",
+    "analysis"
+  ],
+  "author": "chandan purohit",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/guruvyasa/FeedbackAnalysis/issues"
+  },
+  "homepage": "https://github.com/guruvyasa/FeedbackAnalysis#readme",
+  "dependencies": {
+    "request": "^2.87.0"
+  }
+}
