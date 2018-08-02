@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .form-input{
+            margin-bottom:20px;
+        }
+
+        #feedback{
+            vertical-align: top;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-group">
+        <div class="form-input">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name"/>
+        </div>
+        <div class="form-input">
+                <label for="feedback">Feedback</label>
+                <textarea rows=10 type="text" id="feedback" name="feedback"></textarea>
+        </div>
+        <div class="form-input">
+            <button>Submit</button>
+        </div>
+    </div>
+    <script>
+        const getSentiment = require('./sentiment.js').getSentiment;
+
+        const feedbackBox = document.getElementById('feedback');
+
+         const button = document.querySelector('button');
+
+        button.addEventListener('click',(e)=>{
+            let feedbackText = feedbackBox.value;
+            // alert();
+            getSentiment(feedbackText).then((response)=>{
+                let emotion = response.emotion.emotion;
+                console.log(emotion);
+                alert(`You seem to be ${emotion}`); 
+            });
+            
+        });
+
+
+    </script>
+</body>
+</html>
