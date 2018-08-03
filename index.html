@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <title>Document</title>
     <style>
         .form-input{
@@ -13,36 +14,125 @@
         #feedback{
             vertical-align: top;
         }
+    body{
+        background: #5075f0;
+    }
+    form.main{
+        padding:10px;
+        background:#eeffee;
+        margin:30px;
+        margin:0 auto;
+    }
+
+    div.table{
+        width:50%;
+        margin:0 auto;
+    }
+    #emoji{
+        max-width:100%;
+        margin:2px;
+    }
     </style>
 </head>
 <body>
-    <div class="form-group">
-        <div class="form-input">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name"/>
+    <div class="row">
+        <div class="col">
+                <form class="main center">
+                        <div class="form-group">
+                                <div class="form-row">
+                                    <label for="name">Name</label>
+                                    <input type="text" id="name" class="form-control" name="name"/>
+                                </div>
+                                <div class="form-row">
+                                        <label for="feedback">Feedback</label>
+                                        <textarea rows=10 class="form-control" type="text" id="feedback" name="feedback"></textarea>
+                                </div>
+                                <div class="form-input">
+                                    <button class="btn btn-primary">Submit</button>
+                                </div>
+                            </div>
+            
+                </form>
+            
         </div>
-        <div class="form-input">
-                <label for="feedback">Feedback</label>
-                <textarea rows=10 type="text" id="feedback" name="feedback"></textarea>
-        </div>
-        <div class="form-input">
-            <button>Submit</button>
-        </div>
+        <div class="col">
+                <img  id="emoji" alt="">
+            
+        </div>        
+    </div>
+    
+
+    <div class="table">
+        <table >
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Feedback</th>
+                    <th>sentiment</th>                    
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                
+            </tbody>
+        </table>
     </div>
     <script>
         const getSentiment = require('./sentiment.js').getSentiment;
+        const dbHandler = require('./sqliteconnector.js').dbhandler;
+        const dbconnection = new dbHandler();
+        loadRows();
+
+        function getRowHTML(clientName,feedback,sentiment){
+            return  `
+                    <td>${clientName}</td>
+                    <td>${feedback}</td>
+                    <td>${sentiment}</td>                    
+        `;
+        }
+
+        function loadRows(){
+            dbconnection.getData().then((data)=>{
+                data.forEach((row) => {
+                    console.log(row);
+                    let tableRow = document.createElement('tr');
+                    tableRow.innerHTML = getRowHTML(row.clientname,row.feedback,row.sentiment);
+                    tableBody.appendChild(tableRow);       
+                })
+            });
+        }
+    
+        const emojiMap = new Map();
+        emojiMap.set('sad','sad.jpeg');
+        emojiMap.set('excited','happy.jpeg');
+        
 
         const feedbackBox = document.getElementById('feedback');
-
-         const button = document.querySelector('button');
+        const nameBox = document.getElementById('name');
+        const tableBody = document.getElementById('table-body');
+        const emoji = document.getElementById('emoji');     
+        const button = document.querySelector('button');
 
         button.addEventListener('click',(e)=>{
+            e.preventDefault();
             let feedbackText = feedbackBox.value;
+            let clientName = nameBox.value;
+            
             // alert();
             getSentiment(feedbackText).then((response)=>{
                 let emotion = response.emotion.emotion;
                 console.log(emotion);
-                alert(`You seem to be ${emotion}`); 
+                // alert(`You seem to be ${emotion}`);
+                return emotion; 
+            })
+            .then((emotion)=>{
+                return dbconnection.saveData(clientName,feedbackText,emotion);
+            })
+            .then((emotion)=>{
+                let tableRow = document.createElement('tr');
+                tableRow.innerHTML = getRowHTML(clientName,feedbackText,emotion);
+                tableBody.appendChild(tableRow);
+                let imageSrc = emojiMap.get(emotion.toLowerCase());
+                emoji.setAttribute('src',imageSrc);
             });
             
         });
